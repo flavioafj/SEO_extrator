@@ -1,6 +1,7 @@
 import scrapy
 from scrapy.utils.response import open_in_browser
 from scrapy.linkextractors import LinkExtractor
+import re
 
 
 
@@ -48,6 +49,14 @@ class QuotesSpider(scrapy.Spider):
             
         for link in self.link_extractor.extract_links(response):
             if link.text == "Contato":
-                print(link)
+                yield scrapy.Request(link.url, callback=self.contato)
+    
+    def contato(self, response):
+        texto = response.text
+        contato = re.findall(r'\S+@\S+', texto)
+        if contato == None:
+            yield {"contato": response.css('input').getall()}
+        else: 
+            yield {"contato": contato}
 
        
