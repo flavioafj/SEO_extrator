@@ -32,31 +32,45 @@ class QuotesSpider(scrapy.Spider):
     
     link_extractor = LinkExtractor()
 
-    f = open("palavras.txt", "r")
-    print(f.read())
- 
+    with open("palavras.txt", "r")as f:
+        palavras = str(f.read())
+    f.close()
+    lista_de_palavras = palavras.split(", ")
+   
+    #valor = float()
+    contato2 = list()
+    valor = float(1/len(lista_de_palavras))
+
+    nota = float(0)
     def parse(self, response):
+        self.nota = 0
+        
         #open_in_browser(response)
-        if "história" in response.text:
-            yield{
-                "nota": 1
-            }
-        else:
-            yield{
-                "nota": 0
-            }
+        for palavra in self.lista_de_palavras:
+            if palavra in response.text.lower():
+                self.nota += self.valor
+         
 
             
         for link in self.link_extractor.extract_links(response):
-            if link.text == "Contato":
+            if link.text.lower() == "contato" or link.text.lower() == "fale conosco":
                 yield scrapy.Request(link.url, callback=self.contato)
+        
+        
     
     def contato(self, response):
         texto = response.text
-        contato = re.findall(r'\S+@\S+', texto)
-        if contato == None:
-            yield {"contato": response.css('input').getall()}
-        else: 
-            yield {"contato": contato}
+        
+        self.contato2 = re.findall(r'\S+@\S+', texto)
+        if len(self.contato2) == 0:
+            self.contato2 = response.css('input').getall()
+        
+        yield{
+            "dominio": response.url,
+            "nota": self.nota,
+            "contato": self.contato2
+        }
+       
+        
 
        
