@@ -2,7 +2,8 @@ import scrapy
 from scrapy.utils.response import open_in_browser
 from scrapy.linkextractors import LinkExtractor
 import re
-
+import pdb
+import datetime
 
 
 class QuotesSpider(scrapy.Spider):
@@ -37,14 +38,16 @@ class QuotesSpider(scrapy.Spider):
     f.close()
     lista_de_palavras = palavras.split(", ")
    
-    #valor = float()
+    titulo = str()
     contato2 = list()
     valor = float(1/len(lista_de_palavras))
 
     nota = float(0)
     def parse(self, response):
         self.nota = 0
-        
+        vai_render = bool(True)
+        self.titulo = response.css('h1::text').get()
+
         #open_in_browser(response)
         for palavra in self.lista_de_palavras:
             if palavra in response.text.lower():
@@ -53,22 +56,42 @@ class QuotesSpider(scrapy.Spider):
 
             
         for link in self.link_extractor.extract_links(response):
+            """if response.url == 'https://guiaviajarmelhor.com.br/8-lugares-imperdiveis-para-conhecer-em-minas-gerais/':
+                breakpoint()"""
+            
             if link.text.lower() == "contato" or link.text.lower() == "fale conosco":
+                vai_render = bool(False)
                 yield scrapy.Request(link.url, callback=self.contato)
-        
+                
+                break
+
+        if vai_render == True:    
+            yield{
+            "dominio": response.url,
+            "nota": self.nota,
+            "titulo": self.titulo,
+            "contato": "Não encontrado"
+            
+            }
+                
         
     
     def contato(self, response):
         texto = response.text
         
         self.contato2 = re.findall(r'\S+@\S+', texto)
+        #self.contato2 = re.findall(r'([^@|\s]+@[^@]+\.[^@|\s]+)', texto)
         if len(self.contato2) == 0:
             self.contato2 = response.css('input').getall()
+        
+        
         
         yield{
             "dominio": response.url,
             "nota": self.nota,
+            "titulo": self.titulo,
             "contato": self.contato2
+            
         }
        
         
