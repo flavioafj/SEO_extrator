@@ -4,7 +4,16 @@ from scrapy.linkextractors import LinkExtractor
 import re
 import pdb
 import datetime
+from scrapy import Request
+from scrapy_selenium import SeleniumRequest
+from shutil import which
 
+SELENIUM_DRIVER_NAME = 'chrome'
+SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
+SELENIUM_DRIVER_ARGUMENTS='--headless'  # '--headless' if using chrome instead of firefox
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_selenium.SeleniumMiddleware': 800
+}
 
 class QuotesSpider(scrapy.Spider):
     name = 'inde'
@@ -32,6 +41,8 @@ class QuotesSpider(scrapy.Spider):
     ]
     
     link_extractor = LinkExtractor()
+    
+   
 
     with open("palavras.txt", "r")as f:
         palavras = str(f.read())
@@ -46,7 +57,17 @@ class QuotesSpider(scrapy.Spider):
     def parse(self, response):
         self.nota = 0
         vai_render = bool(True)
+        self.titulo = str()
         self.titulo = response.css('h1::text').get()
+        
+        
+     
+        if response.url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
+            yield SeleniumRequest(url=response.url, callback=self.parse2)
+            open_in_browser(response)
+            breakpoint()
+            
+        
 
         #open_in_browser(response)
         for palavra in self.lista_de_palavras:
@@ -56,15 +77,17 @@ class QuotesSpider(scrapy.Spider):
 
             
         for link in self.link_extractor.extract_links(response):
-            """if response.url == 'https://guiaviajarmelhor.com.br/8-lugares-imperdiveis-para-conhecer-em-minas-gerais/':
-                breakpoint()"""
-            
-            if link.text.lower() == "contato" or link.text.lower() == "fale conosco":
+           
+                               
+            if "contato" in link.text.lower() or "fale conosco" in link.text.lower() or "contact" in link.text.lower():
                 vai_render = bool(False)
-                yield scrapy.Request(link.url, callback=self.contato)
                 
+            
+                yield scrapy.Request(link.url, callback=self.contato, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url))
+               
                 break
-
+        
+        
         if vai_render == True:    
             yield{
             "dominio": response.url,
@@ -76,24 +99,31 @@ class QuotesSpider(scrapy.Spider):
                 
         
     
-    def contato(self, response):
+    def contato(self, response, titulo2, nota2, original_url):
         texto = response.text
         
-        self.contato2 = re.findall(r'\S+@\S+', texto)
+        dicio = re.findall(r'\S+@\S+', texto)
+        for um in dicio:
+            self.contato2 += ", "
         #self.contato2 = re.findall(r'([^@|\s]+@[^@]+\.[^@|\s]+)', texto)
         if len(self.contato2) == 0:
-            self.contato2 = response.css('input').getall()
+            #self.contato2 = response.css('input').getall()
+            self.contato2 = response.url
         
-        
+        """if original_url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
+            breakpoint()"""
         
         yield{
-            "dominio": response.url,
-            "nota": self.nota,
-            "titulo": self.titulo,
+            "dominio": original_url,
+            "nota": nota2,
+            "titulo": titulo2,
             "contato": self.contato2
             
         }
        
+    def parse2(self, response):
+        print("contato" in response.text.lower())
+        breakpoint()
         
 
        
