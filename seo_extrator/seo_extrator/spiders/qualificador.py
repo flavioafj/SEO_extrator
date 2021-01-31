@@ -8,12 +8,7 @@ from scrapy import Request
 from scrapy_selenium import SeleniumRequest
 from shutil import which
 
-SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
-SELENIUM_DRIVER_ARGUMENTS='--headless'  # '--headless' if using chrome instead of firefox
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy_selenium.SeleniumMiddleware': 800
-}
+
 
 class QuotesSpider(scrapy.Spider):
     name = 'inde'
@@ -40,6 +35,15 @@ class QuotesSpider(scrapy.Spider):
 
     ]
     
+    custom_settings = {
+        'SELENIUM_DRIVER_NAME':'chrome',
+        'SELENIUM_DRIVER_EXECUTABLE_PATH' : r'C:\\Program Files\\Microsoft\\Web Platform Installer\\chromedriver.exe',
+        'SELENIUM_DRIVER_ARGUMENTS':['--headless'],  # '--headless' if using chrome instead of firefox
+        'DOWNLOADER_MIDDLEWARES' :{
+            'scrapy_selenium.SeleniumMiddleware': 800
+        }
+    }
+    
     link_extractor = LinkExtractor()
     
    
@@ -59,13 +63,15 @@ class QuotesSpider(scrapy.Spider):
         vai_render = bool(True)
         self.titulo = str()
         self.titulo = response.css('h1::text').get()
+        self.contato2 = list()
         
         
      
         if response.url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
-            yield SeleniumRequest(url=response.url, callback=self.parse2)
-            open_in_browser(response)
-            breakpoint()
+            #breakpoint()
+            yield SeleniumRequest(url=response.url, callback=self.parse2, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url), dont_filter=True, wait_time=10)
+            #open_in_browser(response)
+            
             
         
 
@@ -102,16 +108,23 @@ class QuotesSpider(scrapy.Spider):
     def contato(self, response, titulo2, nota2, original_url):
         texto = response.text
         
-        dicio = re.findall(r'\S+@\S+', texto)
+        #dicio = re.findall(r'\S+@\S+', texto)
+        dicio = re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto)
         for um in dicio:
-            self.contato2 += ", "
+            if len(um)>50:
+                dicio.remove(um)
+                
+        
         #self.contato2 = re.findall(r'([^@|\s]+@[^@]+\.[^@|\s]+)', texto)
         if len(self.contato2) == 0:
             #self.contato2 = response.css('input').getall()
             self.contato2 = response.url
+        else:
+            for um in dicio:
+                self.contato2 += ", "
         
-        """if original_url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
-            breakpoint()"""
+        if original_url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
+            breakpoint()
         
         yield{
             "dominio": original_url,
@@ -121,9 +134,14 @@ class QuotesSpider(scrapy.Spider):
             
         }
        
-    def parse2(self, response):
-        print("contato" in response.text.lower())
-        breakpoint()
+    def parse2(self, response, titulo2, nota2, original_url):
+       
+        for linke in self.link_extractor.extract_links(response):
+            if "contato" in linke.text.lower() or "fale conosco" in linke.text.lower() or "contact" in linke.text.lower():
+                breakpoint()
+                yield scrapy.Request(linke.url, callback=self.contato, cb_kwargs=dict(titulo2=titulo2, nota2=nota2, original_url=original_url))
+            
+        
         
 
        
