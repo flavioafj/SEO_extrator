@@ -67,10 +67,6 @@ class QuotesSpider(scrapy.Spider):
         
         
      
-        if response.url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
-            #breakpoint()
-            yield SeleniumRequest(url=response.url, callback=self.parse2, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url), dont_filter=True, wait_time=10)
-            #open_in_browser(response)
             
             
         
@@ -92,18 +88,11 @@ class QuotesSpider(scrapy.Spider):
                 yield scrapy.Request(link.url, callback=self.contato, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url))
                
                 break
-        
-        
-        if vai_render == True:    
-            yield{
-            "dominio": response.url,
-            "nota": self.nota,
-            "titulo": self.titulo,
-            "contato": "Não encontrado"
-            
-            }
                 
-        
+        if vai_render == True: 
+            yield SeleniumRequest(url=response.url, callback=self.parse2, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url), dont_filter=True, wait_time=10)
+            
+   
     
     def contato(self, response, titulo2, nota2, original_url):
         texto = response.text
@@ -116,14 +105,14 @@ class QuotesSpider(scrapy.Spider):
                 
         
         #self.contato2 = re.findall(r'([^@|\s]+@[^@]+\.[^@|\s]+)', texto)
-        if len(self.contato2) == 0:
+        if len(dicio) == 0:
             #self.contato2 = response.css('input').getall()
             self.contato2 = response.url
         else:
             for um in dicio:
                 self.contato2 += ", "
         
-        if original_url == 'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/':
+        if original_url == 'https://www.minasimperador.com.br/':
             breakpoint()
         
         yield{
@@ -135,11 +124,23 @@ class QuotesSpider(scrapy.Spider):
         }
        
     def parse2(self, response, titulo2, nota2, original_url):
-       
+        vao = bool(True)
         for linke in self.link_extractor.extract_links(response):
             if "contato" in linke.text.lower() or "fale conosco" in linke.text.lower() or "contact" in linke.text.lower():
-                breakpoint()
+                vao = bool(False)
+                
                 yield scrapy.Request(linke.url, callback=self.contato, cb_kwargs=dict(titulo2=titulo2, nota2=nota2, original_url=original_url))
+            
+            
+        if vao == bool(True):    
+            yield{
+            "dominio": original_url,
+            "nota": nota2,
+            "titulo": titulo2,
+            "contato": "Não encontrado"
+            
+            }
+            
             
         
         
