@@ -37,7 +37,7 @@ class QuotesSpider(scrapy.Spider):
     
     custom_settings = {
         'SELENIUM_DRIVER_NAME':'chrome',
-        'SELENIUM_DRIVER_EXECUTABLE_PATH' : r'C:\\Program Files\\Microsoft\\Web Platform Installer\\chromedriver.exe',
+        'SELENIUM_DRIVER_EXECUTABLE_PATH' : 'C:\\Users\\Cliente\\webdriver\\chromedriver.exe',
         'SELENIUM_DRIVER_ARGUMENTS':['--headless'],  # '--headless' if using chrome instead of firefox
         'DOWNLOADER_MIDDLEWARES' :{
             'scrapy_selenium.SeleniumMiddleware': 800
@@ -85,35 +85,41 @@ class QuotesSpider(scrapy.Spider):
                 vai_render = bool(False)
                 
             
-                yield scrapy.Request(link.url, callback=self.contato, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url))
+                yield scrapy.Request(link.url, callback=self.contato, cb_kwargs=dict(titulo2=self.titulo, nota2=self.nota, original_url=response.url))
                
                 break
                 
         if vai_render == True: 
-            yield SeleniumRequest(url=response.url, callback=self.parse2, cb_kwargs=dict(titulo2=self.titulo, nota2=self.valor, original_url=response.url), dont_filter=True, wait_time=10)
+            yield SeleniumRequest(url=response.url, callback=self.parse2, cb_kwargs=dict(titulo2=self.titulo, nota2=self.nota, original_url=response.url), dont_filter=True, wait_time=10)
             
    
     
     def contato(self, response, titulo2, nota2, original_url):
-        texto = response.text
+        texto = response.xpath('//body//text()').getall()
+        texto2 = str()
+        for fragmento in texto:
+            texto2 += fragmento + ", "
         
         #dicio = re.findall(r'\S+@\S+', texto)
-        dicio = re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto)
+        dicio = re.findall(r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', texto2[:-2])
         for um in dicio:
             if len(um)>50:
                 dicio.remove(um)
-                
+
+       
         
         #self.contato2 = re.findall(r'([^@|\s]+@[^@]+\.[^@|\s]+)', texto)
         if len(dicio) == 0:
             #self.contato2 = response.css('input').getall()
             self.contato2 = response.url
         else:
+            dois = str()
             for um in dicio:
-                self.contato2 += ", "
+                dois += um + ", "
+            self.contato2 = dois[:-2]
         
-        if original_url == 'https://www.minasimperador.com.br/':
-            breakpoint()
+        """if original_url == 'https://www.minasimperador.com.br/':
+            breakpoint()"""
         
         yield{
             "dominio": original_url,
