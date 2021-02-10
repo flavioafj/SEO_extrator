@@ -13,25 +13,36 @@ from shutil import which
 class QuotesSpider(scrapy.Spider):
     name = 'inde'
     start_urls = [
-        'http://www.descubraminas.com.br/turismo/circuito.aspx',
-        'https://guiaviajarmelhor.com.br/8-lugares-imperdiveis-para-conhecer-em-minas-gerais/',
-        'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/',
-        'https://turismo.ig.com.br/2020-11-24/conheca-destinos-perfeitos-para-viajar-entre-sao-paulo-e-minas-gerais.html',
-        'https://turismodeminas.com.br/',
-        'https://turismodeminas.com.br/dicas/roteiros-de-carro-por-minas-gerais/',
-        'https://viagemeturismo.abril.com.br/estados/minas-gerais/',
-        'https://viagemeturismo.abril.com.br/materias/refugios-no-interior-de-minas-gerais-que-vao-te-deixar-zen/',
-        'https://www.em.com.br/app/noticia/gerais/2020/08/20/interna_gerais,1177704/turismo-em-minas-se-adapta-ao-novo-normal-imposto-pelo-coronavirus.shtml',
-        'https://www.instagram.com/turismodeminas/',
-        'https://www.minasgerais.com.br/',
-        'https://www.minasgerais.com.br/pt/blog/artigo/relatos-de-viagens-dicas-incriveis-do-que-conhecer-em-minas',
-        'https://www.minasimperador.com.br/',
-        'https://www.observatorioturismo.mg.gov.br/',
-        'https://www.passagenspromo.com.br/blog/cidades-turisticas-de-minas-gerais/',
-        'https://www.passagenspromo.com.br/blog/turismo-em-minas-gerais/',
-        'https://www.skyscanner.com.br/noticias/minas-gerais-o-que-fazer-e-cidades-imperdiveis-para-visitar',
+        'https://www.tripadvisor.com.br/Tourism-g303370-State_of_Minas_Gerais-Vacations.html',
+        'https://www.tripadvisor.com.br/Vacation_Packages-g303370-State_of_Minas_Gerais-Vacations.html',
+        'https://www.tripadvisor.com.br/ShowForum-g303370-i4771-State_of_Minas_Gerais.html',
+        'https://www.tripadvisor.com.br/Hotels-g303370-State_of_Minas_Gerais-Hotels.html',
         'https://www.tripadvisor.com.br/Attractions-g303370-Activities-State_of_Minas_Gerais.html',
-        'https://www.viajali.com.br/turismo-minas-gerais-cenarios/'
+        'https://www.feriasbrasil.com.br/mg/',
+        'https://www.minasgerais.com.br/pt/blog/artigo/4-destinos-para-suas-ferias',
+        'https://magazine.trivago.com.br/lugares-para-viajar-minas-gerais/',
+        'https://turismodeminas.com.br/dicas/roteiros-de-carro-por-minas-gerais/',
+        'https://clubdeferias.tur.br/locais/destinos/Minas%252BGerais',
+        'https://www.booking.com/holiday-homes/region/br/minas-gerais.pt-pt.html',
+        'https://www.expedia.com.br/Minas-Gerais-Casas-De-Ferias.d6052632-aaCasasDeFerias.Guia-Viagens-Hospedagem',
+        'https://www.portaldoservidor.mg.gov.br/index.php/acesso-a-informacao/direitos-do-servidor/ferias/ferias-regulamentares',
+        'https://www.portaldoservidor.mg.gov.br/index.php/acesso-a-informacao/direitos-do-servidor/ferias/concessao-de-ferias-premio',
+        'https://muitaviagem.com.br/b/sul-de-minas/',
+        'https://catracalivre.com.br/viagem-livre/10-dicas-imperdiveis-para-voce-curtir-as-ferias-em-minas-gerais/',
+        'http://www.fazenda.mg.gov.br/servidores/cadastro_beneficios/ferias_regulamentares/',
+        'http://www.fazenda.mg.gov.br/servidores/cadastro_beneficios/ferias_regulamentares/page/',
+        'http://agenciaminas.mg.gov.br/noticia/governo-esclarece-que-pagamento-do-um-terco-de-ferias-esta-regularizado',
+        'http://www.agenciaminas.mg.gov.br/noticia/belezas-naturais-de-minas-sao-atrativo-no-periodo-de-ferias',
+        'https://g1.globo.com/mg/minas-gerais/noticia/2021/01/18/casos-de-covid-19-em-bh-podem-aumentar-8-vezes-com-viagens-de-ferias-se-nao-houver-isolamento.ghtml',
+        'https://www4.tjmg.jus.br/juridico/sf/proc_peca_movimentacao.jsp%3Fid%3D930897%26hash%3D50eb2ba2aee1513e669a73f59ea5d445',
+        'https://www.sindpolmg.org.br/governo-de-minas-limita-ferias-premio/',
+        'https://www.kayak.com.br/packagetours/minas-gerais'
+
+
+
+
+
+
 
     ]
     
