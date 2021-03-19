@@ -22,7 +22,7 @@ for x in celulas_preenchidas:
 
 #vamos extrair os textos
     
-document = docx.Document("1.docx")
+document = docx.Document("Documento.docx")
 p = document.paragraphs
 tamanho_txt = len(p)
 y=""
@@ -86,6 +86,7 @@ for x in range(2, contar + 1):
 
 
     #enviar
+    """
     try:
         
         driver.find_element(By.CSS_SELECTOR, "menu[ng-click='onSend()']").click()
@@ -97,7 +98,7 @@ for x in range(2, contar + 1):
         pdb.set_trace()
 
     WebDriverWait(driver, timeout=10).until(EC.visibility_of(By.ID, "notifications"))
-
+"""
 
 
 
